@@ -16,9 +16,13 @@ namespace XbimDev1.Services.Implementation
 
         }
 
+        /// <summary>
+        /// Returns a serialized JSON object consisting all of the IFC types in the model, and the number of times they appeared
+        /// </summary>
+        /// <returns>string</returns>
         public string GetIfcTypes()
         {
-            StringBuilder builder = new StringBuilder("[\n");
+            StringBuilder builder = new StringBuilder("{\n");
             var obj = new Dictionary<string, int>();
             using (var model = IfcStore.Open(FILENAME))
             {
@@ -39,23 +43,25 @@ namespace XbimDev1.Services.Implementation
                 {
                     builder.AppendLine("\t" + pair.Key + ": " + pair.Value);
                 }
-                builder.AppendLine("]");
+                builder.AppendLine("}");
                 return builder.ToString();
             }
         }
 
+        /// <summary>
+        /// Returns a string listing the rooms in the model as well as their net floor areas rounded to 2 decimal places
+        /// </summary>
+        /// <returns>string</returns>
         public string GetRooms()
         {
-            StringBuilder roomList = new StringBuilder("{\n");
-            const string filename = "Models/SampleHouse4.ifc";
-            using (var model = IfcStore.Open(filename))
+            StringBuilder roomList = new StringBuilder("");
+            using (var model = IfcStore.Open(FILENAME))
             {
                 var items = model.Instances.OfType<IfcSpace>();
                 foreach (var item in items)
                 {
-                    roomList.AppendLine("\t" + item.Name + ": " + item.NetFloorArea);
+                    roomList.AppendLine(item.Name + ": " + Math.Round(item.NetFloorArea.Value, 2));
                 }
-                roomList.AppendLine("}");
                 return roomList.ToString();
             }
         }
